@@ -49,7 +49,6 @@
 ;;; Define Back-End
 
 (org-export-define-derived-backend 'pelican 'gfm
-  :filters-alist '((:filter-parse-tree . org-md-separate-elements))
   :menu-entry
   '(?g "Export to Pelican Flavored Markdown"
        ((?G "To temporary buffer"
@@ -92,22 +91,20 @@
              ;;  (or (org-element-property :CUSTOM_ID destination)
              ;;      (org-export-get-reference destination info)))
              (link-name (org-element-property :name
-                                              (org-element-property :parent link))))
+                                              (org-element-property :parent link)))
+             (figure-lines '("<figure id=\"%1$s\">"
+                             ;; "<span id=\"%1$s_span\" style=\"display:none;visibility:hidden\">"
+                             ;; "$$\begin{equation}"
+                             ;; --This one a unique number ID.
+                             ;; "\tag{%2$s}"
+                             ;; "\label{%1$s}"
+                             ;; "\end{equation}$$"
+                             ;; "</span>"
+                             "![%2$s \\label{%1$s}](%3$s)"
+                             "<figcaption>%2$s</figcaption>"
+                             "</figure>")))
         (format
-         ;; TODO:
-         ;; --This 1 needs to be the #+NAME (e.g. "fig:pg_path_plot").
-         (mapconcat #'identity
-                 '("<figure id=\"%1$s\">"
-                   ;; "<span id=\"%1$s_span\" style=\"display:none;visibility:hidden\">"
-                   ;; "$$\begin{equation}"
-                   ;; --This one a unique number ID.
-                   ;; "\tag{%2$s}"
-                   ;; "\label{%1$s}"
-                   ;; "\end{equation}$$"
-                   ;; "</span>"
-                   "![%2$s \\label{%1$s}](%3$s)"
-                   "<figcaption>%2$s</figcaption>"
-                   "</figure>" " "))
+         (mapconcat #'identity figure-lines "\n")
          link-name
          ;; fig-num
          ;; (format "<span data-label=\"%s\"></span>" caption)
@@ -224,7 +221,7 @@ be displayed when `org-export-show-temporary-export-buffer' is
 non-nil."
   (interactive)
   (org-export-to-buffer 'pelican "*Org Pelican Export*"
-    async subtreep visible-only nil nil (lambda () (text-mode))))
+    async subtreep visible-only nil nil (lambda () (markdown-mode))))
 
 ;;;###autoload
 (defun org-pelican-export-to-markdown (&optional async subtreep visible-only)
