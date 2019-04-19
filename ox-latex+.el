@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'ox)
 (require 'ox-latex)
 (require 'ox-publish)
 (require 's)
@@ -102,7 +103,7 @@
                      (src-block . org-latex+//org-latex-src-block))
   :options-alist '((:latex-format-drawer-function nil nil #'org-latex+//org-format-drawer-function)
                    (:latex-listings nil nil 'minted)
-                   (:figure-dir "FIGURE_DIR" nil nil t))
+                   (:figure-dir "FIGURE_DIR" nil nil t)))
 
   
 ;;; Internal functions

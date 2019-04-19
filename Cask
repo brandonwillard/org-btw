@@ -3,7 +3,7 @@
 (source org)
 
 (package "org-btw" "0" "Custom org-mode exporters and settings.")
-(files "org-btw*.el" "ox-pelican.el")
+(files "org-btw*.el" "ox-pelican.el" "ox-latex+.el" "org-ref+.el")
 
 (depends-on "cask")
 (depends-on "cl-lib")
@@ -12,3 +12,5 @@
 (depends-on "s")
 (depends-on "projectile")
 (depends-on "string-inflection")
+(depends-on "org-ref")
+(depends-on "markdown-mode")

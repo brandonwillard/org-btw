@@ -35,6 +35,7 @@
 (require 'ox-publish)
 (require 's)
 (require 'projectile)
+(require 'markdown-mode)
 
 ;;; User-Configurable Variables
 

@@ -1,5 +1,7 @@
 (define-package "org-btw" "0" "Custom org-mode exporters and settings."
-  '((string-inflection nil)
+  '((markdown-mode nil)
+    (org-ref nil)
+    (string-inflection nil)
     (projectile nil)
     (s nil)
     (ox-gfm nil)
