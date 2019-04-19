@@ -23,7 +23,7 @@
 
 ;;; Commentary:
 
-;; This library extends the standard LaTeX backend by
+;; This library extends the standard LaTeX backend.
 
 ;;; Code:
 

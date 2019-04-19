@@ -21,6 +21,7 @@
 (require 'org-ref)
 (require 's)
 (require 'f)
+(require 'string-inflection)
 
 (defun org-ref+//org-ref-enable-bib-as-option ()
   "Add BIBLIOGRAPHY and BIBLIOGRAPHYSTYLE as universal export options and

@@ -1,0 +1,31 @@
+#+TITLE: =org-btw=
+#+AUTHOR: Brandon T. Willard
+
+* Purpose
+
+Custom =org-mode=-related settings and exporters.
+
+** =org-ref= Modifications
+
+   Enable with minor mode =org-ref+-mode=.
+
+   This mode makes the following change(s):
+   - Turn =#BIBLIOGRAPHY= (as used by =org-ref= ) into an =org-mode= option.
+
+** =ox-latex= Modifications
+
+   Provides an =org-latex+= exporter with the following:
+   - Multi-page code listings via =tcolorbox=.
+   - More flexible output directory options for PDF exports.
+
+** =ox-pelican= Exporter
+
+    An exporter for Pelican sites.
+
+* Usage
+   To use as a Cask dependency:
+   #+BEGIN_SRC elisp :eval never :exports code :results none
+   (depends-on "org-ref+"
+               :git "https://github.com/brandonwillard/org-btw.git"
+               :branch "master")
+   #+END_SRC

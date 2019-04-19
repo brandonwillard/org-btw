@@ -11,3 +11,4 @@
 (depends-on "ox-gfm")
 (depends-on "s")
 (depends-on "projectile")
+(depends-on "string-inflection")
