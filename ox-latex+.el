@@ -45,16 +45,18 @@
 (defcustom org-latex+-format-non-env-drawers '("results")
   "The drawer names in this list will not be exported as LaTeX environments."
   :group 'org-export-latex+
-  :type '(repeat (string :tag "Drawer name")))
+  :type '(repeat (string :tag "Drawer Name")))
 
 (defcustom org-latex+-pdf-output-dir nil
   "Output directory for PDF files."
-  :group 'org-export-latex+)
+  :group 'org-export-latex+
+  :type '(string :tag "PDF Output Directory"))
 
 (defcustom org-latex+-listings-wrapper
   'tcolorbox
   "Wrapper for listings (e.g. tcolorbox)"
-  :group 'org-export-latex+)
+  :group 'org-export-latex+
+  :type '(const :tag "LaTeX Listings Wrapper"))
 
 (defcustom org-latex+-tcolorbox-listing-env
   "\\newtcblisting[auto counter,number within=section]{oxtcblisting}[1]{%
@@ -74,9 +76,12 @@
 \tcenter title,
 \t#1
 }"
-  ;; , boxed title style={empty, size=minimal}, attach boxed title to bottom center={yshift=-10pt}
-  "Default tcolorbox listings environment"
-  :group 'org-export-latex+)
+  "Default tcolorbox listings environment.
+
+`ox-latex+' uses the listing named \"oxtcblisting\", so the environment that this command
+creates should use that name."
+  :group 'org-export-latex+
+  :type '(string :tag "tcolorbox Listing Definition"))
 
 
 ;;; Define Back-End
@@ -108,15 +113,13 @@
   
 ;;; Internal functions
 
+;;;###autoload
 (defun org-latex+//org-latex-template (contents info)
-  (org-latex-template contents info))
-
-(defun org-latex+//org-latex-make-preamble (info &optional template snippet?)
   (let ((org-latex-listings 'minted)
         (org-latex-prefer-user-labels t)
         (org-latex-packages-alist '(("" "minted")
                                     ("minted, listings, breakable, skins" "tcolorbox"))))
-    (org-latex-make-preamble info template snippet?)))
+    (org-latex-template contents info)))
 
 (defun org-latex+//org-format-drawer-function (name contents)
   "Turn drawers into custom LaTeX blocks."
