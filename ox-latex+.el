@@ -108,8 +108,7 @@
 ;;; Internal functions
 
 (defun org-latex+//org-latex-template (contents info)
-  (let ((org-latex-template org-latex+//org-latex-template))
-    (org-latex-template contents info))))
+  (org-latex-template contents info))
 
 (defun org-latex+//org-latex-make-preamble (info &optional template snippet?)
   (let ((org-latex-listings 'minted)
@@ -164,7 +163,7 @@ This is mostly the standard `ox-latex' with only the following differences:
                                                       ,(plist-get attributes :listing-options)))
                                         ",")))
       (cond
-       ((eq org-latex-listings-wrapper 'tcolorbox)
+       ((eq org-latex+-listings-wrapper 'tcolorbox)
         (let* ((listings-env-name (or (plist-get attributes :listings-env-name) "oxtcblisting"))
                (body (format "\\begin{%s}{minted language=%s, %s}\n%s\n\\end{%1$s}"
                              ;;
