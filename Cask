@@ -10,6 +10,7 @@
 (depends-on "org-plus-contrib")
 (depends-on "ox-gfm")
 (depends-on "s")
+(depends-on "f")
 (depends-on "projectile")
 (depends-on "string-inflection")
 (depends-on "org-ref")

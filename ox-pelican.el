@@ -93,7 +93,7 @@
              ;;      (org-export-get-reference destination info)))
              (link-name (org-element-property :name
                                               (org-element-property :parent link)))
-             (figure-lines '("<figure id=\"%1$s\">"
+             (figure-lines '("<figure id=\"%1$s\" class=\"plot\">"
                              ;; "<span id=\"%1$s_span\" style=\"display:none;visibility:hidden\">"
                              ;; "$$\begin{equation}"
                              ;; --This one a unique number ID.
@@ -183,17 +183,38 @@ as a communication channel."
 
 E.g., '```{#block-name .python}'
 
-For Pandoc, use with 'fenced_code_attributes'
+For Pandoc, use with 'backtick_code_blocks' and 'fenced_code_attributes'.
 "
   (let* ((lang (org-element-property :language src-block))
          (code (org-export-format-code-default src-block info))
-         (link-id (org-export-get-reference src-block info))
-         ;; (name (org-element-property :name src-block))
+         (caption (org-export-data (org-export-get-caption
+                                    ;; (org-export-get-parent-element link)
+                                    src-block)
+                                   info))
+         (name (org-element-property :name src-block))
+         ;; We only want to add the link name and special CSS class when a
+         ;; reference is actually made to this src-block.
+         (has-ref (and name
+                       (org-element-map (plist-get info :parse-tree)
+                           'link
+                         (lambda (l)
+                           (let ((id (org-element-property :path l)))
+                             (string-equal name id)))
+                         nil
+                         t)))
+         (link-id (and name
+                       has-ref
+                       (org-export-get-reference src-block info)))
          (prefix (if link-id
-                     ;; TODO: Add a class for result blocks?
-                     (concat "```{#" link-id " ." lang "}\n")
-                   (concat "```{." lang "}\n")))
-         (suffix "```"))
+                     (format "<figure id=\"%s\">\n```{.%s}\n" link-id lang)
+                   (concat "<figure>\n```{." lang "}\n")))
+         (suffix (if (or link-id (not (string-empty-p caption)))
+                     (format "```\n<figcaption>Listing %s%s</figcaption>\n</figure>"
+                             (org-export-get-ordinal src-block info)
+                             (if (string-empty-p caption)
+                                 ""
+                               (concat ": " caption)))
+                   "```\n</figure>")))
     (concat prefix code suffix)))
 
 ;;; Interactive function

@@ -110,7 +110,7 @@ creates should use that name."
                    (:latex-listings nil nil 'minted)
                    (:figure-dir "FIGURE_DIR" nil nil t)))
 
-  
+
 ;;; Internal functions
 
 ;;;###autoload
