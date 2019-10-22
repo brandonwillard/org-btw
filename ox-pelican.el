@@ -219,6 +219,7 @@ For Pandoc, use with 'backtick_code_blocks' and 'fenced_code_attributes'.
 
 ;;; Interactive function
 
+;;;###autoload
 (defun org-pelican-export-as-markdown (&optional async subtreep visible-only)
   "Export current buffer to a Pelican Flavored Markdown buffer.
 
