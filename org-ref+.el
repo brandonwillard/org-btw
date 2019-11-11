@@ -202,18 +202,15 @@ keyword."
                ;; Truncate paths (i.e. rely on LaTeX build to figure out bib file locations).
                ;; Could use `file-relative-name' against `(plist-get info :publishing-directory)'.
                (bib-locs (mapconcat #'file-name-nondirectory (plist-get info :bibliography) ","))
-               ;; XXX: `org-ref-bibliography-format' is very lame and simply
-               ;; `cond'itions on a fixed set of formats, so there's no good way
-               ;; to make this work with an export format derived from another
-               ;; derived format.
+               ;; XXX: `org-ref-bibliography-format' simply `cond'itions on a
+               ;; fixed set of formats, so there's no good way to make this work
+               ;; with an export format derived from another derived format.
                ;; `org-ref' doesn't know about derived modes, so use the parent.
-               ;; TODO: would be much better if we could use `org-export-derived-backend-p'.
-               (backend-parents (org-ref+//org-export-get-parent-backends backend))
                (backend-and-bib-value (cl-some (lambda (bend)
-                                     (cons bend (org-ref-bibliography-format bib-locs nil bend)))
-                                   backend-parents))
-               (backend (car backend-and-bib-value))
-               (backend-parent (org-export-backend-parent (org-export-get-backend backend)))
+                                                 (cons bend (org-ref-bibliography-format bib-locs nil bend)))
+                                               (org-ref+//org-export-get-parent-backends backend)))
+               (backend-parent (car backend-and-bib-value))
+               ;; (backend-parent (org-export-backend-parent (org-export-get-backend backend)))
                (bib-value (cdr backend-and-bib-value))
                (parent (org-element-property :parent last-bib-elem))
                (parent-end (org-element-property :end parent))
