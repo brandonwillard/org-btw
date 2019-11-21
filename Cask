@@ -15,3 +15,8 @@
 (depends-on "string-inflection")
 (depends-on "org-ref")
 (depends-on "markdown-mode")
+
+(development
+ ;; (depends-on "org-test" :git "git@github.com:emacsmirror/org.git" :files ("testing/org-test.el"))
+ (depends-on "ert")
+ (depends-on "ert-runner"))
