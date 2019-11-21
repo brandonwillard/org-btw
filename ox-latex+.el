@@ -89,7 +89,7 @@ creates should use that name."
 (org-export-define-derived-backend 'latex+ 'latex
   :filters-alist '((:filter-body . org-latex+//org-export-latex-add-tcolorbox))
   :menu-entry
-  '(?l "Export to LaTeX+"
+  '(?i "Export to LaTeX+"
        ((?L "To temporary buffer"
             (lambda (a s v b) (org-latex+-export-as-latex a s v)))
         (?l "To file" (lambda (a s v b) (org-latex+-export-to-latex a s v)))

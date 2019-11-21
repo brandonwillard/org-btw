@@ -51,7 +51,7 @@
 
 (org-export-define-derived-backend 'pelican 'gfm
   :menu-entry
-  '(?g "Export to Pelican Flavored Markdown"
+  '(?p "Export to Pelican Flavored Markdown"
        ((?G "To temporary buffer"
             (lambda (a s v b) (org-pelican-export-as-markdown a s v)))
         (?g "To file" (lambda (a s v b) (org-pelican-export-to-markdown a s v)))
