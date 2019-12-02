@@ -3,12 +3,13 @@
 (source org)
 
 (package "org-btw" "0" "Custom org-mode exporters and settings.")
-(files "org-btw*.el" "ox-pelican.el" "ox-latex+.el" "org-ref+.el")
+(files "org-btw*.el" "ox-pelican.el" "ox-latex+.el" "org-ref+.el" "ox-sphinx.el")
 
 (depends-on "cask")
 (depends-on "cl-lib")
 (depends-on "org-plus-contrib")
 (depends-on "ox-gfm")
+(depends-on "ox-rst")
 (depends-on "s")
 (depends-on "f")
 (depends-on "projectile")

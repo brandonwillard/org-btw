@@ -1,6 +1,6 @@
 ;;; test-ox-pelican.el --- Tests for Pelican-friendly Markdown Back-End for Org Export Engine
 
-;; Copyright (C) 2018 Brandon T. Willard
+;; Copyright (C) 2019 Brandon T. Willard
 
 ;; Author: Brandon T. Willard
 ;; Keywords: org, pelican, markdown, github

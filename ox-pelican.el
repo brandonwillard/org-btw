@@ -217,7 +217,7 @@ For Pandoc, use with 'backtick_code_blocks' and 'fenced_code_attributes'.
                    "```\n</figure>")))
     (concat prefix code suffix)))
 
-;;; Interactive function
+;;; Interactive functions
 
 ;;;###autoload
 (defun org-pelican-export-as-markdown (&optional async subtreep visible-only)

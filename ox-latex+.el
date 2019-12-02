@@ -23,7 +23,7 @@
 
 ;;; Commentary:
 
-;; This library extends the standard LaTeX backend.
+;; This library that extends the standard LaTeX backend.
 
 ;;; Code:
 
@@ -37,7 +37,7 @@
 
 (defgroup org-export-latex+ nil
   "Options specific to LaTeX+ export back-end."
-  :tag "Org LaTeX+ LaTeX"
+  :tag "Org LaTeX+"
   :group 'org-export
   :version "24.4"
   :package-version '(Org . "8.0"))
