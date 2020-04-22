@@ -34,8 +34,10 @@
 (require 'ox-gfm)
 (require 'ox-publish)
 (require 's)
+(require 'dash)
 (require 'projectile)
 (require 'markdown-mode)
+(require 'org-btw-utils)
 
 ;;; User-Configurable Variables
 
@@ -84,6 +86,16 @@
                        (concat type ":" raw-path))
                       ((not (file-name-absolute-p raw-path)) raw-path)
                       (t (expand-file-name raw-path)))))
+             ;; If the given path doesn't have the image (or only an image name
+             ;; is given), then check the project's figure directory--if there
+             ;; is one.
+             (path (if-let* (((not (f-exists? path)))
+                             (base-dir (or (org-btw//org-publish-property :base-directory) default-directory))
+                             (figure-dir (or (org-btw//org-publish-property :figure-dir) default-directory))
+                             (new-path (f-join figure-dir path))
+                             ((f-exists? new-path)))
+                       (f-relative new-path base-dir)
+                     path))
              (caption (org-export-data (org-export-get-caption
                                         (org-export-get-parent-element link))
                                        info))
@@ -142,27 +154,36 @@
           (format "title: %s"
                   (car (plist-get org-env ':title))))
          (res (cons title-str res))
-         (tags-str (s-join "," (plist-get org-env ':filetags)))
-         (tags-str (and (not (s-blank? tags-str))
-                        (format "tags: '%s'" tags-str)))
-         (res (or (and tags-str
-                       (cons tags-str res))
+         ;; Add file tags to the metadata
+         (file-tags (plist-get org-env ':filetags))
+         (res (or (-some--> file-tags
+                    (s-join "," it)
+                    (format "tags: '%s'" it)
+                    (cons it res))
                   res))
-         (mdate-str (calendar-current-date))
-         (mdate-str (format "modified: '%s-%s-%s'"
-                            (nth 2 mdate-str)
-                            (nth 0 mdate-str)
-                            (nth 1 mdate-str)))
-         (res (or (and mdate-str
-                       (cons mdate-str res))
+         ;; If "draft" or "published" is a tag, put it in the "status" metadata
+         ;; field
+         (res (or (-some--> file-tags
+                    (cond
+                     ((member "draft" it)
+                      (format "status: draft"))
+                     ((member "published" it)
+                      (format "status: published")))
+                    (cons it res))
                   res))
-         (bib-str (plist-get org-env ':bibliography))
-         (bib-str (and bib-str
-                       (format "bibliography:\n- '%s'"
-                               (apply #'f-join
-                                      (cdr (f-split (car bib-str)))))))
-         (res (or (and bib-str
-                       (cons bib-str res))
+         ;; Add a modified date
+         (res (or (-some--> (calendar-current-date)
+                    (format "modified: '%s-%s-%s'"
+                            (nth 2 it)
+                            (nth 0 it)
+                            (nth 1 it))
+                    (cons it res))
+                  res))
+         (res (or (-some--> (plist-get org-env ':bibliography)
+                    (format "bibliography:\n- '%s'"
+                            (apply #'f-join
+                                   (cdr (f-split (car it)))))
+                    (cons it res))
                   res))
          (res (append '("---")
                       res
