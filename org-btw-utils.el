@@ -19,9 +19,10 @@
 (defun org-btw//org-publish-property (prop)
   "Get the publish property PROP (a tag/keyword like `:base-directory') for
 the current file's project."
-  (org-publish-property prop
-                        (org-publish-get-project-from-filename
-                         (buffer-file-name (buffer-base-buffer)))))
+  (ignore-errors
+    (org-publish-property prop
+                          (org-publish-get-project-from-filename
+                           (buffer-file-name (buffer-base-buffer))))))
 (defun org-btw//org-babel-get-call-var-value (var-name)
   "Extract the value of a named variable from a CALL statement."
   ;; What about `org-element-context' and `org-babel-parse-header-arguments'?

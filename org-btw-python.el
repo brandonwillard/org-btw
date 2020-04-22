@@ -116,8 +116,8 @@ Example usage: \":results output graphics :file plot.png\"
   (let* ((graphics-file (and (member "graphics" (assq :result-params params))
 			                       (org-babel-graphical-output-file params))))
     (when graphics-file
-      (let* ((root-dir (or (ignore-errors (org-btw//org-publish-property :base-directory)) default-directory))
-             (output-dir (or (ignore-errors (org-btw//org-publish-property :figure-dir)) default-directory))
+      (let* ((root-dir (or (org-btw//org-publish-property :base-directory) default-directory))
+             (output-dir (or (org-btw//org-publish-property :figure-dir) default-directory))
              ;; TODO: Get a list of extensions
              ;; (file-ext (file-name-extension out-file))
              (new-body
