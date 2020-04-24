@@ -140,20 +140,21 @@
       (org-md-section paragraph contents info))))
 
 (defun org-pelican-create-yaml (&optional info)
+  "Create a YAML block with meta information used by Pelican."
   (let* ((org-env (or info (org-export-get-environment)))
          (res '())
-         (author-str
-          (format "author: '%s'"
-                  (car (plist-get org-env ':author))))
-         (res (cons author-str res))
-         (date-str
-          (format "date: '%s'"
-                  (car (plist-get org-env ':date))))
-         (res (cons date-str res))
-         (title-str
-          (format "title: %s"
-                  (car (plist-get org-env ':title))))
-         (res (cons title-str res))
+         (res (or (-some--> (car (plist-get org-env ':author))
+                    (format "author: '%s'" it)
+                    (cons it res))
+                  res))
+         (res (or (-some--> (plist-get org-env ':date)
+                    (format "date: '%s'" (car it))
+                    (cons it res))
+                  res))
+         (res (or (-some--> (car (plist-get org-env ':title))
+                    (format "title: %s" it)
+                    (cons it res))
+                  res))
          ;; Add file tags to the metadata
          (file-tags (plist-get org-env ':filetags))
          (res (or (-some--> file-tags
@@ -180,9 +181,8 @@
                     (cons it res))
                   res))
          (res (or (-some--> (plist-get org-env ':bibliography)
-                    (format "bibliography:\n- '%s'"
-                            (apply #'f-join
-                                   (cdr (f-split (car it)))))
+                    (format "bibliography:\n%s"
+                            (mapconcat (lambda (x) (format "- '%s'" (f-expand x))) it "\n"))
                     (cons it res))
                   res))
          (res (append '("---")

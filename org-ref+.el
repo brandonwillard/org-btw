@@ -22,10 +22,11 @@
 (require 's)
 (require 'f)
 (require 'string-inflection)
+(require 'org-btw-utils)
 
 
 (defun org-ref+//org-ref-bibliography-format (old-func keyword desc format)
-  (let ((backends (cons format (org-ref+//org-export-get-parent-backends format))))
+  (let ((backends (cons format (org-btw//org-export-get-parent-backends format))))
     (cl-some (lambda (bend)
                (funcall old-func keyword desc bend))
              backends)))
@@ -93,7 +94,7 @@
 ;; Might be related to `org-ref-ref-html', but definetly involves `org-ref-eqref-export'.
 (defun org-ref+//org-ref-eqref-export (old-fun keyword desc format)
   (cond
-   ((or (eq format 'html) (eq format 'md))
+   ((intersection '(md html) (cons format (org-btw//org-export-get-parent-backends format)))
     (format "\\(\\eqref{%s}\\)" keyword))
    (t (funcall old-fun keyword desc format))))
 
@@ -161,7 +162,8 @@ This function sets and returns `org-ref-bibliography-files' obtained from
   (prog1
       ;; When called from within a bibtex file, assume we want it; otherwise,
       ;; check the current file for a bibliography source.
-      (setq org-ref-bibliography-files (or (and (f-ext? buffer-file-name "bib")
+      (setq org-ref-bibliography-files (or (and buffer-file-name
+                                                (f-ext? buffer-file-name "bib")
                                                 (list buffer-file-name))
                                             (plist-get (org-export-get-environment)
                                                       :bibliography)
@@ -174,22 +176,13 @@ This function sets and returns `org-ref-bibliography-files' obtained from
       ;; Set reftex-default-bibliography so we can search.
       (setq-local reftex-default-bibliography org-ref-bibliography-files)))
 
-(defun org-ref+//org-export-get-parent-backends (backend)
-  (when (symbolp backend) (setq backend (org-export-get-backend backend)))
-  (when backend
-    (let ((backends))
-      (catch 'exit
-        (while (org-export-backend-parent backend)
-	        (unless backend ;; (memq (org-export-backend-name backend) backends)
-	          (throw 'exit t))
-	        (setq backend
-	              (org-export-get-backend (org-export-backend-parent backend)))
-          (setq backends (cons (org-export-backend-name backend) backends)))
-        (reverse backends)))))
-
 (defun org-ref+//org-ref-parse-bib-latex-entries (tree backend info)
   "Add an export block with the bibliography at the location of the last bibliography
-keyword."
+keyword.
+
+XXX: If the backend doesn't have a transcoder for an export block, then the
+bibliography won't appear in the results!
+"
   (let ((last-bib-elem))
     (org-element-map tree
         '(keyword)
@@ -206,22 +199,28 @@ keyword."
                ;; fixed set of formats, so there's no good way to make this work
                ;; with an export format derived from another derived format.
                ;; `org-ref' doesn't know about derived modes, so use the parent.
-               (backend-and-bib-value (cl-some (lambda (bend)
+               (backend-lineage (org-btw//org-export-get-parent-backends backend))
+               (backend-and-bib-block (cl-some (lambda (bend)
                                                  (cons bend (org-ref-bibliography-format bib-locs nil bend)))
-                                               (org-ref+//org-export-get-parent-backends backend)))
-               (backend-parent (car backend-and-bib-value))
-               ;; (backend-parent (org-export-backend-parent (org-export-get-backend backend)))
-               (bib-value (cdr backend-and-bib-value))
+                                               backend-lineage))
+               (backend-parent (car backend-and-bib-block))
+               (bib-block-src (cdr backend-and-bib-block))
                (parent (org-element-property :parent last-bib-elem))
                (parent-end (org-element-property :end parent))
                (new-bib-elem))
-          (when (and bib-style (eq backend-parent 'latex))
-            (setq bib-value (concat (format "\\bibliographystyle{%s}\n" bib-style) bib-value)))
-          (setq new-bib-elem (org-element-create 'export-block
-                                                 (list :type (string-inflection-upcase-function (symbol-name backend-parent))
-                                                       :value bib-value
-                                                       :begin parent-end
-                                                       :end (+ parent-end (seq-length bib-value)))))
+          (when (and bib-style (member 'latex backend-lineage))
+            (setq bib-block-src (concat (format "\\bibliographystyle{%s}\n" bib-style) bib-block-src)))
+          (setq new-bib-elem
+                ;; The bibliography source is already transcoded, so we need it
+                ;; to pass through this backend's transcoding without changes.
+                (org-element-create 'entity
+                                    (list :name "bibliography"
+                                          :ascii bib-block-src
+                                          :utf-8 bib-block-src
+                                          :html bib-block-src
+                                          :latex bib-block-src
+                                          :begin parent-end
+                                          :end (+ parent-end (seq-length bib-block-src)))))
           (org-element-set-element last-bib-elem new-bib-elem)))
     tree))
 

@@ -23,6 +23,20 @@ the current file's project."
     (org-publish-property prop
                           (org-publish-get-project-from-filename
                            (buffer-file-name (buffer-base-buffer))))))
+
+(defun org-btw//org-export-get-parent-backends (backend)
+  (when (symbolp backend) (setq backend (org-export-get-backend backend)))
+  (when backend
+    (let ((backends))
+      (catch 'exit
+        (while (org-export-backend-parent backend)
+	        (unless backend ;; (memq (org-export-backend-name backend) backends)
+	          (throw 'exit t))
+	        (setq backend
+	              (org-export-get-backend (org-export-backend-parent backend)))
+          (setq backends (cons (org-export-backend-name backend) backends)))
+        (reverse backends)))))
+
 (defun org-btw//org-babel-get-call-var-value (var-name)
   "Extract the value of a named variable from a CALL statement."
   ;; What about `org-element-context' and `org-babel-parse-header-arguments'?
