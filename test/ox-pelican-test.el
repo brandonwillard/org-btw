@@ -58,7 +58,7 @@ hi
                  "See <a href=\"#c26e94c1b0b80ac3545371089d4f9936\">(Willard 2018)</a>.
 
 # Bibliography
-<a id=\"WillardProgrammingIntelligentCity2018a\"></a>[WillardProgrammingIntelligentCity2018a] Willard, Programming an Intelligent City: The Role of Data Science, <i>CityBase</i>, (2018). <a href=\"https://thecitybase.com/programming-an-intelligent-city-the-role-of-data-science/\">link</a>. [↩](#c26e94c1b0b80ac3545371089d4f9936)")))
+<a id=\"WillardProgrammingIntelligentCity2018a\"></a> Willard, Programming an Intelligent City: The Role of Data Science, <i>CityBase</i>, (2018). <a href=\"https://thecitybase.com/programming-an-intelligent-city-the-role-of-data-science/\">link</a>. [↩](#c26e94c1b0b80ac3545371089d4f9936)")))
 
 (ert-deftest test-yaml-metadata-basic ()
   (should

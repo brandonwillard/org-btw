@@ -24,6 +24,13 @@
 (require 'string-inflection)
 (require 'org-btw-utils)
 
+(defun org-ref+//org-ref-get-bibtex-entry-md (key)
+  "Return a md string for the bibliography entry corresponding to KEY."
+  (format "<a id=\"%s\"></a> %s%s [↩](#%s)"
+	        key
+	        (org-ref-clean-unused-entry-html (org-ref-get-bibtex-entry-citation key))
+          ""
+	        (md5 key)))
 
 (defun org-ref+//org-ref-bibliography-format (old-func keyword desc format)
   (let ((backends (cons format (org-btw//org-export-get-parent-backends format))))
@@ -36,14 +43,14 @@
  include an org export filter that produces a bibliography at the location of
  the the BIBLIOGRAPHY option."
 
-  (advice-add #'org-ref-bibliography-format :around #'org-ref+//org-ref-bibliography-format)
-
   (add-to-list 'org-export-options-alist
                 '(:bibliography "BIBLIOGRAPHY" nil nil split))
   (add-to-list 'org-export-options-alist
                 '(:bibliographystyle "BIBLIOGRAPHYSTYLE" nil
                                     nil t))
 
+  (advice-add #'org-ref-get-bibtex-entry-md :override #'org-ref+//org-ref-get-bibtex-entry-md)
+  (advice-add #'org-ref-bibliography-format :around #'org-ref+//org-ref-bibliography-format)
   (advice-add #'org-ref-find-bibliography :override #'org-ref+//org-ref-find-bibliography)
 
   (add-to-list 'org-export-filter-parse-tree-functions
@@ -53,6 +60,7 @@
   (setq org-export-options-alist (assq-delete-all :bibliography org-export-options-alist))
   (setq org-export-options-alist (assq-delete-all :bibliographystyle org-export-options-alist))
 
+  (advice-remove #'org-ref-get-bibtex-entry-md #'org-ref+//org-ref-get-bibtex-entry-md)
   (advice-remove #'org-ref-bibliography-format #'org-ref+//org-ref-bibliography-format)
   (advice-remove #'org-ref-find-bibliography #'org-ref+//org-ref-find-bibliography)
 
