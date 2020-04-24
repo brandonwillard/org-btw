@@ -68,8 +68,9 @@
 
 (defun* org-ref+//create-md-link (key &optional (format-string "%a (%y)"))
   "A custom Markdown formatting for references."
-  (format "<a href=\"#%s\">%s</a>"
+  (format "<a id=\"%s\"><a href=\"#%s\">%s</a></a>"
           (md5 key)
+          key
           (let ((org-ref-bibliography-files (org-ref-find-bibliography))
                 (bib-file)
                 (author)
@@ -96,7 +97,9 @@
               (setq author (cdr (assoc "author" bibtex-entry)))
               (setq year (cdr (assoc "year" bibtex-entry)))
               (setq entry (org-ref-reftex-format-citation bibtex-entry format-string)))
-            (replace-regexp-in-string "[\"\{\}]" "" (htmlize-escape-or-link entry)))))
+            (org-ref-clean-unused-entry-html
+             (replace-regexp-in-string "[\"\{\}]" ""
+                                       (htmlize-escape-or-link entry))))))
 
 ;; TODO: Make `[[eqref:...]]` output `\(\eqref{...}\)` in Markdown output.
 ;; Might be related to `org-ref-ref-html', but definetly involves `org-ref-eqref-export'.
