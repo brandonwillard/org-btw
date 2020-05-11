@@ -116,38 +116,40 @@ Example usage: \":results output graphics :file plot.png\"
   (let* ((graphics-file (and (member "graphics" (assq :result-params params))
 			                       (org-babel-graphical-output-file params))))
     (when graphics-file
-      (let* ((root-dir (or (org-btw//org-publish-property :base-directory) default-directory))
-             (output-dir (or (org-btw//org-publish-property :figure-dir) default-directory))
+      (let* (;; (root-dir (or (org-btw//org-publish-property :base-directory) default-directory))
+             ;; (output-dir (or (org-btw//org-publish-property :figure-dir) default-directory))
+             (graphics-file (f-expand graphics-file))
              ;; TODO: Get a list of extensions
              ;; (file-ext (file-name-extension out-file))
              (new-body
               (format "
-plt.ioff()
+old_backend = plt.get_backend()
 
-%s
+try:
+    plt.switch_backend('Agg')
+except ModuleNotFoundError:
+    pass
+
+%0s
+
+plt.show(block=False)
 
 import os
 
-output_dir = '%s'
-# fig_filenames = [os.path.join(output_dir, '...')
-#                  + os.path.extsep + out_ext
-#                  for out_ext in ['pdf', 'png']]
-fig_filenames = [os.path.join(output_dir, '%s')]
-
-# try:
-#     plt.switch_backend('Agg')
-# except ModuleNotFoundError:
-#     pass
+fig_filenames = ['%2s']
 
 for fname in fig_filenames:
    plt.savefig(fname)
 
-_ = os.path.relpath(fig_filenames[-1], '%s')
+plt.close()
 
-plt.ion()
+try:
+    plt.switch_backend(old_backend)
+except ModuleNotFoundError:
+    pass
 
-" body output-dir graphics-file root-dir)))
-        ;; TODO: Output a figure link?
+_ = fig_filenames[-1]
+" body graphics-file)))
         (setq body new-body)))
     (let ((res (funcall orig-func body params)))
       (if graphics-file nil res))))
@@ -180,7 +182,7 @@ plt.ion()
                     #'org-btw//ob-python-generate-plots)
 
         ;; projectile-aware org file compilation/exporting
-        (when (configuration-layer/package-used-p 'projectile)
+        (when (featurep 'projectile)
           (advice-add #'org-compile-file :override #'org-btw//org-compile-file)
           (advice-add #'org-export-output-file-name :around
                       #'org-btw//org-export-output-project-file-name))
@@ -196,7 +198,7 @@ plt.ion()
       (advice-remove #'org-babel-load-session:python #'org-btw//org-babel-load-session:python)
       (advice-remove #'org-babel-execute:python #'org-btw//ob-python-generate-plots)
 
-      (when (configuration-layer/package-used-p 'projectile)
+      (when (featurep 'projectile)
         (advice-remove #'org-compile-file #'spacemacs//org-compile-file)
         (advice-remove #'org-export-output-file-name
                     #'org-btw//org-export-output-project-file-name)))))

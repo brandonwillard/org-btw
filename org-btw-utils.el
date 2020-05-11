@@ -14,7 +14,6 @@
 (require 'cl-lib)
 (require 'org-macs)
 (require 'f)
-(require 'projectile)
 
 (defun org-btw//org-publish-property (prop)
   "Get the publish property PROP (a tag/keyword like `:base-directory') for
@@ -53,27 +52,28 @@ the current file's project."
          (org-btw//org-babel-get-call-var-value ,(symbol-name var)))
        ,var))
 
-;; TODO: Replace `projectile' dependencies with generic variables that can be
-;; set to use `projectile'.
-(defun org-btw//org-export-output-project-file-name (orig-fun extension &optional subtreep pub-dir)
-  "A wrapper for `org-export-output-file-name' that exports to a project's
+(when (featurep 'projectile)
+  ;; TODO: Replace `projectile' dependencies with generic variables that can be
+  ;; set to use `projectile'.
+  (defun org-btw//org-export-output-project-file-name (orig-fun extension &optional subtreep pub-dir)
+    "A wrapper for `org-export-output-file-name' that exports to a project's
 corresponding source directory as determined by EXTENSION.
 
 Uses `projectile-src-directory' plus the EXTENSION to determine the exact output
 sub-directory."
-  (let* ((projectile-require-project-root nil)
-         (proj-root (projectile-project-root))
-         (lang-src-dir (when proj-root
-                         (f-join proj-root
-                                 (projectile-src-directory (projectile-project-type))
-                                 (s-chop-prefix "." extension))))
-         (pub-dir (if (and lang-src-dir
-                           (f-exists? lang-src-dir))
-                      lang-src-dir
-                    pub-dir)))
-    (message "%s" pub-dir)
-    (funcall orig-fun extension subtreep pub-dir)))
-(defun org-btw//org-compile-file (source process ext &optional err-msg log-buf spec)
+    (let* ((projectile-require-project-root nil)
+           (proj-root (projectile-project-root))
+           (lang-src-dir (when proj-root
+                           (f-join proj-root
+                                   (projectile-src-directory (projectile-project-type))
+                                   (s-chop-prefix "." extension))))
+           (pub-dir (if (and lang-src-dir
+                             (f-exists? lang-src-dir))
+                        lang-src-dir
+                      pub-dir)))
+      (message "%s" pub-dir)
+      (funcall orig-fun extension subtreep pub-dir)))
+  (defun org-btw//org-compile-file (source process ext &optional err-msg log-buf spec)
     "Same as `org-compile-file' but considers the variable `org-projectile-output-dir'
 for the output directory."
     (let* ((projectile-require-project-root nil)
@@ -115,7 +115,7 @@ for the output directory."
       (unless (org-file-newer-than-p output time)
         (error (format "File %S wasn't produced: %s" output
                        err-msg)))
-      output))
+      output)))
 
 (defmacro org-btw//session-and-process-name (org-babel-buffer-alist
                                                &optional use-internal)

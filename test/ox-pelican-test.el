@@ -72,8 +72,8 @@ hi
 "
      (org-export-as 'pelican))
 
-    "---
-modified: '2020-4-23'
+    (format "---
+modified: '%s'
 status: draft
 tags: 'draft,blah'
 title: Testing
@@ -83,7 +83,7 @@ figure_dir: '{attach}/articles/figures/'
 figure_ext: png
 ---
 
-")))
+" (format-time-string "%Y-%-m-%-d")))))
 
 (ert-deftest test-yaml-metadata-bib-and-missing ()
   (should
@@ -99,13 +99,13 @@ figure_ext: png
     (format "---
 bibliography:
 - '%s'
-modified: '2020-4-23'
+modified: '%s'
 author: '%s'
 figure_dir: '{attach}/articles/figures/'
 figure_ext: png
 ---
 
-" (f-expand "test/test.bib") (user-full-name)))))
+" (f-expand "test/test.bib") (format-time-string "%Y-%-m-%-d") (user-full-name)))))
 
 
 (provide 'test-ox-pelican)
