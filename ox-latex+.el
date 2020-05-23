@@ -47,6 +47,11 @@
   :group 'org-export-latex+
   :type '(repeat (string :tag "Drawer Name")))
 
+(defcustom org-latex+-minted-package-only nil
+  "Only add the minted package."
+  :group 'org-export-latex+
+  :type 'boolean)
+
 (defcustom org-latex+-pdf-output-dir nil
   "Output directory for PDF files."
   :group 'org-export-latex+
@@ -117,14 +122,16 @@ creates should use that name."
 (defun org-latex+//org-latex-template (contents info)
   (let ((org-latex-listings 'minted)
         (org-latex-prefer-user-labels t)
-        (org-latex-packages-alist '(("" "minted")
-                                    ("minted, listings, breakable, skins" "tcolorbox"))))
+        (org-latex-packages-alist (if org-latex+-minted-package-only
+                                      '(("" "minted") ("minted, listings, breakable, skins" "tcolorbox"))
+                                    org-latex-packages-alist)))
     (org-latex-template contents info)))
 
 (defun org-latex+//org-format-drawer-function (name contents)
   "Turn drawers into custom LaTeX blocks."
   (let ((name (downcase name)))
-    (unless (member name org-latex+-format-non-env-drawers)
+    (if (member name org-latex+-format-non-env-drawers)
+        contents
       (format "\\begin{%s}\n%s\n\\end{%s}" name contents name))))
 
 (defun org-latex+//org-latex-src-block (src-block _contents info)
