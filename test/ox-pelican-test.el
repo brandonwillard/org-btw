@@ -86,26 +86,27 @@ figure_ext: png
 " (format-time-string "%Y-%-m-%-d")))))
 
 (ert-deftest test-yaml-metadata-bib-and-missing ()
-  (should
-   (equal
-    (org-test-with-temp-text
-     "#+BIBLIOGRAPHYSTYLE: plainnat
+  (let ((user-full-name "test-user"))
+    (should
+     (equal
+      (org-test-with-temp-text
+       "#+BIBLIOGRAPHYSTYLE: plainnat
 #+BIBLIOGRAPHY: test/test.bib
 "
-     (require 'org-ref+)
-     (org-ref+-mode +1)
-     (org-export-as 'pelican))
+       (require 'org-ref+)
+       (org-ref+-mode +1)
+       (org-export-as 'pelican))
 
-    (format "---
+      (format "---
 bibliography:
 - '%s'
 modified: '%s'
-author: '%s'
+author: 'test-user'
 figure_dir: '{attach}/articles/figures/'
 figure_ext: png
 ---
 
-" (f-expand "test/test.bib") (format-time-string "%Y-%-m-%-d") (user-full-name)))))
+" (f-expand "test/test.bib") (format-time-string "%Y-%-m-%-d"))))))
 
 
 (provide 'test-ox-pelican)
