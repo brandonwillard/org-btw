@@ -1,6 +1,8 @@
 #+TITLE: =org-btw=
 #+AUTHOR: Brandon T. Willard
 
+[[Testing Workflow][file:https://github.com/brandonwillard/org-btw/workflows/Testing%20Workflow/badge.svg]]
+
 * Purpose
 
 Custom =org-mode=-related settings and exporters.
