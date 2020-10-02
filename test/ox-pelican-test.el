@@ -44,7 +44,6 @@ hi
 
 </div>"))
 
-
 (ert-deftest test-bibliography ()
   (should (equal (org-test-with-temp-text
                   "See [[citep:WillardProgrammingIntelligentCity2018a]].

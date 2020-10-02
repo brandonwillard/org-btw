@@ -65,18 +65,18 @@
   :translate-alist '((template . org-pelican-template)
 		                 (section . org-pelican-md-section)
 		                 (link . org-pelican-md-link)
+                     (drawer . org-pelican-drawer)
                      (src-block . org-pelican-src-block))
-  :options-alist '((:html-format-drawer-function nil nil #'org-pelican-html-format-drawer)
-                   (:figure-dir "FIGURE_DIR" nil nil t)))
-
-
-(defun org-pelican-html-format-drawer (name contents)
-  "Turn drawers into HTML divs."
-  ;; TODO: Add a class for result blocks?
-  (format "<div class=\"%s\" markdown=\"\">\n%s\n</div>" (downcase name) contents))
+  :options-alist '((:figure-dir "FIGURE_DIR" nil nil t)))
 
 
 ;;; Transcode Functions
+(defun org-pelican-drawer (drawer contents info)
+  "Turn drawers into HTML divs."
+  ;; TODO: Add a class for result blocks?
+  (let ((name (org-element-property :drawer-name drawer)))
+    (format "<div class=\"%s\" markdown=\"\">\n%s\n</div>" (downcase name) contents)))
+
 (defun org-pelican-md-link (link contents info)
   (if (org-export-inline-image-p link org-html-inline-image-rules)
       (let* ((type (org-element-property :type link))
