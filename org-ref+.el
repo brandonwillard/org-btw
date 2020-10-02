@@ -66,7 +66,7 @@
 
   (remove-hook 'org-export-filter-parse-tree-functions #'org-ref+//org-ref-parse-bib-latex-entries))
 
-(defun* org-ref+//create-md-link (key &optional (format-string "%a (%y)"))
+(cl-defun org-ref+//create-md-link (key &optional (format-string "%a (%y)"))
   "A custom Markdown formatting for references."
   (format "<a id=\"%s\"><a href=\"#%s\">%s</a></a>"
           (md5 key)
@@ -105,7 +105,7 @@
 ;; Might be related to `org-ref-ref-html', but definetly involves `org-ref-eqref-export'.
 (defun org-ref+//org-ref-eqref-export (old-fun keyword desc format)
   (cond
-   ((intersection '(md html) (cons format (org-btw//org-export-get-parent-backends format)))
+   ((cl-intersection '(md html) (cons format (org-btw//org-export-get-parent-backends format)))
     (format "\\(\\eqref{%s}\\)" keyword))
    (t (funcall old-fun keyword desc format))))
 
