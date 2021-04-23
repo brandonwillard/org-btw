@@ -12,6 +12,41 @@
 ;;; Code:
 (require 'org-btw-utils)
 
+(defun org-btw//org-babel-python--send-string (session body)
+  "Pass BODY to the Python process in SESSION.
+Return output."
+  (with-current-buffer session
+    (let* ((string-buffer "")
+	         (comint-output-filter-functions
+	          (cons (lambda (text) (setq string-buffer
+				                               (concat string-buffer text)))
+		              comint-output-filter-functions))
+	         (body (format "\
+eoe = \"\"\"
+%s
+\"\"\"
+try:
+%s
+except Exception as e:
+    e.args = (\"{}{}\".format(e.args[0], eoe), *e.args[1:])
+    raise
+else:
+    print(eoe)
+"
+			                   org-babel-python-eoe-indicator
+			                   (org-babel-python--shift-right body 4))))
+      (if (not (eq 'python-mode org-babel-python-mode))
+	        (let ((python-shell-buffer-name
+		             (org-babel-python-without-earmuffs session)))
+	          (python-shell-send-string body))
+	      (require 'python-mode)
+	      (py-shell-send-string body (get-buffer-process session)))
+      ;; same as `python-shell-comint-end-of-output-p' in emacs-25.1+
+      (while (not (string-match
+		               org-babel-python-eoe-indicator
+		               string-buffer))
+	      (accept-process-output (get-buffer-process (current-buffer))))
+      (org-babel-chomp (substring string-buffer 0 (match-beginning 0))))))
 (defun org-btw//org-babel-load-session:python (session body params)
   "Load BODY into SESSION using python-shell-send-string-echo."
   (declare-function python-shell-send-string "python.el")
@@ -154,9 +189,36 @@ _ = fig_filenames[-1]
     (let ((res (funcall orig-func body params)))
       (if graphics-file nil res))))
 
+(defmacro org-btw//session-and-process-name (org-babel-buffer-alist
+                                               &optional use-internal)
+  (declare (debug (listp "org-babel-buffer-alist" &rest booleanp)))
+  (let ((func-name (intern (concat "org-btw//"
+                                   (symbol-name org-babel-buffer-alist)
+                                   "-process-name"))))
+    `(defun ,func-name (orig-func &optional internal)
+       "Prepend the org-babel session name to `*-shell-get-process-name'."
+       (if (and ,use-internal internal)
+           (funcall orig-func internal)
+         (let* ((session (cdr (assq :session
+                                    (nth 2 (or org-src--babel-info
+                                               (ignore-errors (org-babel-get-src-block-info)))))))
+                (cached-process-name (when session
+                                       (cdr (assoc (intern session) ,org-babel-buffer-alist)))))
+           (if cached-process-name
+               (string-remove-suffix "*" (string-remove-prefix "*" cached-process-name))
+             (let* ((process-name-orig (funcall orig-func (and ,use-internal internal)))
+                    (process-name
+                     (if (and session (not (eq session :default))
+                              (not (s-prefix? (format "[%s]" session) process-name-orig)))
+                         (format "[%s]%s" session process-name-orig)
+                       process-name-orig)))
+               ;; Re-attach earmuffs, if they were present
+               process-name)))))))
+
+
 ;; Create a function that can wrap the process-name function and
 ;; prepend a session (if present).
-(spacemacs//session-and-process-name org-babel-python-buffers nil)
+(org-btw//session-and-process-name org-babel-python-buffers nil)
 
 ;;;###autoload
 (define-minor-mode org-btw-python-mode
@@ -177,6 +239,9 @@ _ = fig_filenames[-1]
         (advice-add #'org-babel-load-session:python :override
                     #'org-btw//org-babel-load-session:python)
 
+        (advice-add #'org-babel-python--send-string :override
+                    #'org-btw//org-babel-python--send-string)
+
         ;; Enable graphics output
         (advice-add #'org-babel-execute:python :around
                     #'org-btw//ob-python-generate-plots)
@@ -188,10 +253,11 @@ _ = fig_filenames[-1]
                       #'org-btw//org-export-output-project-file-name))
 
         ;; Add our custom babel execution functions
-        (spacemacs/set-leader-keys-for-major-mode 'org-mode
-          "bh" #'org-btw/org-babel-execute-from-here)
-        (spacemacs/set-leader-keys-for-major-mode 'org-mode
-          "bD" #'org-babel-remove-result-one-or-many))
+        (when (functionp 'spacemacs/set-leader-keys-for-major-mode)
+          (spacemacs/set-leader-keys-for-major-mode 'org-mode
+            "bh" #'org-btw/org-babel-execute-from-here)
+          (spacemacs/set-leader-keys-for-major-mode 'org-mode
+            "bD" #'org-babel-remove-result-one-or-many)))
     (progn
       (advice-remove #'python-shell-get-process-name #'org-btw//org-babel-python-buffers-process-name)
       (advice-remove #'org-babel-python-session-buffer #'org-btw//org-babel-python-session-buffer)
@@ -199,7 +265,7 @@ _ = fig_filenames[-1]
       (advice-remove #'org-babel-execute:python #'org-btw//ob-python-generate-plots)
 
       (when (featurep 'projectile)
-        (advice-remove #'org-compile-file #'spacemacs//org-compile-file)
+        (advice-remove #'org-compile-file #'org-btw//org-compile-file)
         (advice-remove #'org-export-output-file-name
                     #'org-btw//org-export-output-project-file-name)))))
 
