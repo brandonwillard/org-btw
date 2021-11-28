@@ -158,6 +158,8 @@ Example usage: \":results output graphics :file plot.png\"
              ;; (file-ext (file-name-extension out-file))
              (new-body
               (format "
+import matplotlib.pyplot as plt
+
 old_backend = plt.get_backend()
 
 try:
