@@ -24,6 +24,8 @@
 (require 'string-inflection)
 (require 'org-btw-utils)
 
+(declare-function org-ref-bibliography-entry-format "org-ref-url-utils")
+
 (defun org-ref+//org-ref-get-bibtex-entry-md (key)
   "Return a md string for the bibliography entry corresponding to KEY."
   (format "<a id=\"%s\"></a> %s%s [↩](#%s)"

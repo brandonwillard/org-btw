@@ -14,7 +14,7 @@
 (depends-on "f")
 (depends-on "projectile")
 (depends-on "string-inflection")
-(depends-on "org-ref")
+(depends-on "org-ref" "1.1.1")
 (depends-on "markdown-mode")
 
 (development
