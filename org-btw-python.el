@@ -257,7 +257,7 @@ _ = fig_filenames[-1]
         ;; Add our custom babel execution functions
         (when (functionp 'spacemacs/set-leader-keys-for-major-mode)
           (spacemacs/set-leader-keys-for-major-mode 'org-mode
-            "bh" #'org-btw/org-babel-execute-from-here)
+            "bh" #'org-btw//org-babel-execute-from-here)
           (spacemacs/set-leader-keys-for-major-mode 'org-mode
             "bD" #'org-babel-remove-result-one-or-many)))
     (progn
