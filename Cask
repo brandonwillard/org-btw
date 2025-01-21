@@ -12,6 +12,7 @@
 (depends-on "ox-rst")
 (depends-on "s")
 (depends-on "f")
+(depends-on "htmlize")
 (depends-on "projectile")
 (depends-on "string-inflection")
 (depends-on "org-ref" "1.1.1")

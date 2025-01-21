@@ -21,6 +21,7 @@
 (require 'org-ref)
 (require 's)
 (require 'f)
+(require 'htmlize)
 (require 'string-inflection)
 (require 'org-btw-utils)
 
