@@ -212,7 +212,7 @@ bibliography won't appear in the results!
                ;; fixed set of formats, so there's no good way to make this work
                ;; with an export format derived from another derived format.
                ;; `org-ref' doesn't know about derived modes, so use the parent.
-               (backend-lineage (org-btw//org-export-get-parent-backends backend))
+               (backend-lineage (or (org-btw//org-export-get-parent-backends backend) (cons backend ())))
                (backend-and-bib-block (cl-some (lambda (bend)
                                                  (cons bend (org-ref-bibliography-format bib-locs nil bend)))
                                                backend-lineage))
