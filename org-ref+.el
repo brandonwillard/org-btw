@@ -26,6 +26,24 @@
 
 (declare-function org-ref-bibliography-entry-format "org-ref-url-utils")
 
+(defun org-ref-clean-unused-entry-html (entry-html)
+  "Return from the html string ENTRY-HTML a cleaner version"
+  ;; unescape the &
+  (setq entry-html (replace-regexp-in-string "\\\\&" "&" entry-html))
+  ;; hack to replace {} around text
+  (setq entry-html (replace-regexp-in-string "{" "" entry-html))
+  (setq entry-html (replace-regexp-in-string "}" "" entry-html))
+  ;; get rid of empty parens
+  (setq entry-html (replace-regexp-in-string "()" "" entry-html))
+  ;; Remove empty volume, number field if empty
+  (setq entry-html (replace-regexp-in-string "<b></b>," "" entry-html))
+  ;; get rid of empty link and doi
+  (setq entry-html (replace-regexp-in-string " <a href=\"\">link</a>\\." "" entry-html))
+  ;; change double dash to single dash
+  (setq entry-html (replace-regexp-in-string "--" "-" entry-html))
+  (setq entry-html (replace-regexp-in-string " <a href=\"http://dx\\.doi\\.org/\">doi</a>\\." "" entry-html))
+  entry-html)
+
 (defun org-ref+//org-ref-get-bibtex-entry-md (key)
   "Return a md string for the bibliography entry corresponding to KEY."
   (format "<a id=\"%s\"></a> %s%s [↩](#%s)"
