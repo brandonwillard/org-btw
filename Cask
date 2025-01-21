@@ -15,7 +15,7 @@
 (depends-on "htmlize")
 (depends-on "projectile")
 (depends-on "string-inflection")
-(depends-on "org-ref" "1.1.1")
+(depends-on "org-ref" :git "https://github.com/jkitchin/org-ref" :ref "v1.1.1")
 (depends-on "markdown-mode")
 
 (development
